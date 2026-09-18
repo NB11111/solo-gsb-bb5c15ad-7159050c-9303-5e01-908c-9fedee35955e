@@ -1,0 +1,22 @@
+services:
+  audit-web:
+    build: .
+    container_name: sample-audit-web
+    ports:
+      - "8000:8000"
+    volumes:
+      - audit-data:/data
+    environment:
+      # SQLite 数据库文件位置（位于挂载卷内，容器重建后数据保留）
+      AUDIT_DB_PATH: /data/audit.db
+      # 可选：自定义时间断档阈值（小时），默认 24
+      # GAP_HOURS: 24
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/samples')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  audit-data:

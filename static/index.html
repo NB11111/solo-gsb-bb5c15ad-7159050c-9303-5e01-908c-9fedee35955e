@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>样本交接链路审计</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">🧪 样本交接链路审计系统</div>
+  <div class="topbar-right">
+    <label class="gap-setting">
+      时间断档阈值
+      <input type="number" id="gapHours" min="0" step="1" value="24">
+      小时
+    </label>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- 左侧：样本列表 -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <span>样本列表</span>
+      <button class="btn btn-primary btn-sm" id="btnNewSample">＋ 新建</button>
+    </div>
+    <ul class="sample-list" id="sampleList">
+      <li class="placeholder">加载中…</li>
+    </ul>
+  </aside>
+
+  <!-- 右侧：审计主视图 -->
+  <section class="content" id="content">
+    <div class="empty-state" id="emptyState">
+      <p>请选择左侧样本，或新建一个样本开始录入交接事件。</p>
+    </div>
+
+    <div id="detail" hidden>
+      <div class="detail-head">
+        <div>
+          <h1 id="sampleTitle"></h1>
+          <div class="sample-meta" id="sampleMeta"></div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn" id="btnEditSample">编辑样本</button>
+          <button class="btn btn-danger-ghost" id="btnDeleteSample">删除</button>
+        </div>
+      </div>
+
+      <!-- 审计结论横幅 -->
+      <div class="audit-banner" id="auditBanner">
+        <div class="audit-headline" id="auditHeadline"></div>
+        <div class="audit-summary" id="auditSummary"></div>
+        <div class="audit-actions">
+          <button class="btn btn-primary" id="btnNewEvent">＋ 录入交接事件</button>
+          <a class="btn" id="btnExportMd" href="#">导出 Markdown 报告</a>
+          <a class="btn" id="btnExportHtml" href="#">导出 HTML 报告</a>
+        </div>
+      </div>
+
+      <!-- 异常清单 -->
+      <section class="card">
+        <h2>冲突与异常</h2>
+        <ul class="findings" id="findingsList"></ul>
+      </section>
+
+      <!-- 时间线 -->
+      <section class="card">
+        <h2>交接时间线 <small>（按发生时间排序，序号为录入顺序）</small></h2>
+        <ol class="timeline" id="timeline"></ol>
+      </section>
+    </div>
+  </section>
+</main>
+
+<!-- 样本弹窗 -->
+<div class="modal-mask" id="sampleModal" hidden>
+  <div class="modal">
+    <h2 id="sampleModalTitle">新建样本</h2>
+    <form id="sampleForm">
+      <label>样本编号 *
+        <input type="text" id="sampleCode" required maxlength="64" placeholder="如 S-2026-001">
+      </label>
+      <label>样本名称 *
+        <input type="text" id="sampleName" required maxlength="128" placeholder="如 第三批水质样本">
+      </label>
+      <label>描述
+        <textarea id="sampleDesc" rows="2" maxlength="500"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-close>取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 事件弹窗 -->
+<div class="modal-mask" id="eventModal" hidden>
+  <div class="modal">
+    <h2 id="eventModalTitle">录入交接事件</h2>
+    <form id="eventForm">
+      <input type="hidden" id="eventId">
+      <label>发生时间 *
+        <input type="datetime-local" id="eventTime" required step="60">
+      </label>
+      <div class="row-2">
+        <label>交出方 *
+          <input type="text" id="eventFrom" required maxlength="64" placeholder="如 采样组-张三">
+        </label>
+        <label>接收方 *
+          <input type="text" id="eventTo" required maxlength="64" placeholder="如 运输组-李四">
+        </label>
+      </div>
+      <label>交接地点
+        <input type="text" id="eventLocation" maxlength="128" placeholder="如 冷链库 A 区">
+      </label>
+      <label>备注
+        <textarea id="eventNote" rows="2" maxlength="500"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-close>取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
